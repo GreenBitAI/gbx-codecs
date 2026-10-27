@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gbx-codecs"
+version = "0.1.0"
+description = "Audio codecs for speech models served by gbx-lm, run as a companion process on Apple silicon"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "licenses/*"]
+requires-python = ">=3.10"
+authors = [{ name = "GreenBitAI" }]
+dependencies = ["mlx>=0.29", "numpy>=1.24", "miniaudio>=1.59"]
+classifiers = [
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+[project.urls]
+Homepage = "https://github.com/GreenBitAI/gbx-codecs"
+
+[project.scripts]
+gbx-codecs = "gbx_codecs.__main__:main"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gbx_codecs"]
+
+[tool.ruff]
+line-length = 110
+# Ported as upstream wrote it, so the two can be diffed.
+extend-exclude = ["src/gbx_codecs/fish_s1/dac.py"]

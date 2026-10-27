@@ -7,7 +7,7 @@ name = "gbx-codecs"
 version = "0.1.0"
 description = "Audio codecs for speech models served by gbx-lm, run as a companion process on Apple silicon"
 readme = "README.md"
-license = "Apache-2.0"
+license = "MIT"
 license-files = ["LICENSE", "licenses/*"]
 requires-python = ">=3.10"
 authors = [{ name = "GreenBitAI" }]

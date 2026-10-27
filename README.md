@@ -46,7 +46,7 @@ Decoding is streaming: frames sent a piece at a time decode to the same audio wh
 
 ## License
 
-Apache License 2.0, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
 
 The Fish Audio S1 DAC implementation in `src/gbx_codecs/fish_s1/dac.py` is ported from [mlx-audio](https://github.com/Blaizzy/mlx-audio) (MIT License, Copyright (c) 2024 Prince Canuma; see [licenses/LICENSE.mlx-audio.txt](licenses/LICENSE.mlx-audio.txt)). The codec weights are distributed with the models under the model's own license; this package does not include them.
 

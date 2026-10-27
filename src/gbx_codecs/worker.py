@@ -46,7 +46,7 @@ class Worker:
         return self.codec
 
     def handle(self, header: dict[str, Any], payload: bytes) -> tuple[dict[str, Any], bytes]:
-        import mlx.core as mx  # noqa: PLC0415
+        import mlx.core as mx
 
         op = header.get("op")
         if op == "hello":
@@ -56,7 +56,7 @@ class Worker:
             if name not in CODECS:
                 raise ValueError(f"unknown codec {name!r}; this version has {', '.join(CODECS)}")
             if (name, path) != (self.name, self.path):
-                from .fish_s1 import DAC  # noqa: PLC0415
+                from .fish_s1 import DAC
 
                 self.codec, self.name, self.path = DAC.from_pretrained(path), name, path
             codec = self.codec
@@ -107,7 +107,7 @@ class Worker:
 
 
 def serve(stdin: IO[bytes], stdout: IO[bytes]) -> None:
-    import mlx.core as mx  # noqa: PLC0415
+    import mlx.core as mx
 
     mx.set_cache_limit(CACHE_LIMIT)
     worker = Worker()

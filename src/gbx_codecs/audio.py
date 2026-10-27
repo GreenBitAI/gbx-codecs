@@ -10,7 +10,7 @@ import numpy as np
 
 def read_audio(path: str | Path, sample_rate: int) -> np.ndarray:
     """Mono float32 samples of an audio file (wav, flac, mp3, ...) at ``sample_rate``."""
-    import miniaudio  # noqa: PLC0415
+    import miniaudio
 
     decoded = miniaudio.decode_file(
         str(path),

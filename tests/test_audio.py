@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 
 from gbx_codecs.audio import Resampler, to_pcm16
@@ -13,7 +15,7 @@ def test_pieces_resample_exactly_as_the_whole():
     whole = Resampler(44100, 24000)(x, final=True)
     r = Resampler(44100, 24000)
     cuts = [0, 1, 2047, 2048, 5000, 30000, 44100]
-    pieces = [r(x[a:b], final=b == len(x)) for a, b in zip(cuts, cuts[1:])]
+    pieces = [r(x[a:b], final=b == len(x)) for a, b in itertools.pairwise(cuts)]
     assert np.array_equal(np.concatenate(pieces), whole)
 
 

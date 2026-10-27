@@ -18,13 +18,13 @@ from .worker import CACHE_LIMIT, MAX_DECODE_FRAMES
 
 
 def _codec(model_dir: str):
-    from .fish_s1 import DAC  # noqa: PLC0415
+    from .fish_s1 import DAC
 
     return DAC.from_pretrained(model_dir)
 
 
 def _decode(codec, codes: np.ndarray) -> np.ndarray:
-    import mlx.core as mx  # noqa: PLC0415
+    import mlx.core as mx
 
     codec.reset_streaming_state()
     parts = [
@@ -37,7 +37,7 @@ def _decode(codec, codes: np.ndarray) -> np.ndarray:
 
 
 def _write_wav(path: str, samples: np.ndarray, rate: int) -> None:
-    from .audio import to_pcm16  # noqa: PLC0415
+    from .audio import to_pcm16
 
     with wave.open(path, "wb") as w:
         w.setnchannels(1)
@@ -63,11 +63,11 @@ def main(argv: list[str] | None = None) -> None:
     a = ap.parse_args(argv)
 
     if a.cmd == "serve":
-        from .worker import main as serve  # noqa: PLC0415
+        from .worker import main as serve
 
         serve()
         return
-    import mlx.core as mx  # noqa: PLC0415
+    import mlx.core as mx
 
     mx.set_cache_limit(CACHE_LIMIT)
     codec = _codec(a.model_dir)
@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> None:
         )
         sys.exit(0 if corr > 0.5 else 1)
     if a.cmd == "encode":
-        from .audio import read_audio  # noqa: PLC0415
+        from .audio import read_audio
 
         audio = read_audio(a.audio, codec.sample_rate)
         idx, lengths = codec.encode(mx.array(audio)[None, None, :])

@@ -5,6 +5,9 @@
 # Copyright (c) 2024 Prince Canuma; see licenses/LICENSE.mlx-audio.txt.
 # Changes: no Hugging Face download (a local model directory is required);
 # otherwise kept as upstream wrote it, so the two can be diffed.
+#
+# This implements Fish Audio's codec. Used with Fish Audio's codec weights, it is
+# subject to the Fish Audio Community License that comes with those weights.
 from __future__ import annotations
 
 import math

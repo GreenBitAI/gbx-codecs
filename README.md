@@ -48,6 +48,8 @@ Decoding is streaming: frames sent a piece at a time decode to the same audio wh
 
 MIT, see [LICENSE](LICENSE).
 
+The `fish_s1` codec implements Fish Audio's audio codec, the one Fish Audio Drama 3 uses. It was ported from mlx-audio; use it with Fish Audio's codec weights only as the [Fish Audio Community License](https://huggingface.co/fishaudio/drama-3) that comes with those weights allows.
+
 The Fish Audio S1 DAC implementation in `src/gbx_codecs/fish_s1/dac.py` is ported from [mlx-audio](https://github.com/Blaizzy/mlx-audio) (MIT License, Copyright (c) 2024 Prince Canuma; see [licenses/LICENSE.mlx-audio.txt](licenses/LICENSE.mlx-audio.txt)). The codec weights are distributed with the models under the model's own license; this package does not include them.
 
 Not affiliated with or endorsed by Fish Audio.

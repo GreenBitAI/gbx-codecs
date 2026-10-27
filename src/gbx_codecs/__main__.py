@@ -14,6 +14,8 @@ import wave
 
 import numpy as np
 
+from .worker import CACHE_LIMIT, MAX_DECODE_FRAMES
+
 
 def _codec(model_dir: str):
     from .fish_s1 import DAC  # noqa: PLC0415
@@ -26,8 +28,10 @@ def _decode(codec, codes: np.ndarray) -> np.ndarray:
 
     codec.reset_streaming_state()
     parts = [
-        np.array(codec.streaming_step(mx.array(codes[:, b : b + 32])[None])[0, 0].astype(mx.float32))
-        for b in range(0, codes.shape[1], 32)
+        np.array(
+            codec.streaming_step(mx.array(codes[:, b : b + MAX_DECODE_FRAMES])[None])[0, 0].astype(mx.float32)
+        )
+        for b in range(0, codes.shape[1], MAX_DECODE_FRAMES)
     ]
     return np.concatenate(parts) if parts else np.zeros(0, np.float32)
 
@@ -65,6 +69,7 @@ def main(argv: list[str] | None = None) -> None:
         return
     import mlx.core as mx  # noqa: PLC0415
 
+    mx.set_cache_limit(CACHE_LIMIT)
     codec = _codec(a.model_dir)
     if a.cmd == "check":
         rate = codec.sample_rate

@@ -19,7 +19,7 @@ python3 -m venv ~/.gbx-codecs
 ~/.gbx-codecs/bin/pip install gbx-codecs
 ```
 
-Dependencies: `mlx`, `numpy`, and `miniaudio` (to read reference audio in wav, flac or mp3). No PyTorch and no ffmpeg.
+Dependencies: `mlx`, `numpy`, and `miniaudio` (to read reference audio in wav, flac or mp3). No PyTorch and no ffmpeg. The process needs about 3 GB of memory while decoding (Fish S1: 1.75 GB of weights, decoded 8 frames at a time).
 
 Check it against a downloaded model:
 

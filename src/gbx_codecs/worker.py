@@ -25,6 +25,12 @@ from .audio import Resampler, read_audio, to_pcm16
 from .protocol import VERSION, read_message, write_message
 
 CODECS = ("fish_s1",)
+# Decoding runs in pieces of at most this many frames, and MLX keeps at most
+# CACHE_LIMIT of freed buffers. Fish S1 at 64 frames a piece peaked at 5.9 GiB
+# with 7 GiB more held in MLX's cache; at 8, 2.8 GiB and 0.3, still 13x real
+# time. The audio moves by at most one 16-bit step (see the README).
+MAX_DECODE_FRAMES = 8
+CACHE_LIMIT = 256 << 20
 
 
 class Worker:
@@ -80,8 +86,15 @@ class Worker:
             if self.resampler is None:
                 raise RuntimeError("no decode stream; send `begin` first")
             codes = np.frombuffer(payload, dtype=np.int32).reshape(header["shape"])
-            audio = codec.streaming_step(mx.array(codes)[None])
-            samples = np.array(audio[0, 0].astype(mx.float32))
+            pieces = [
+                np.array(
+                    codec.streaming_step(mx.array(codes[:, i : i + MAX_DECODE_FRAMES])[None])[0, 0].astype(
+                        mx.float32
+                    )
+                )
+                for i in range(0, codes.shape[1], MAX_DECODE_FRAMES)
+            ]
+            samples = np.concatenate(pieces) if pieces else np.zeros(0, np.float32)
             return {"ok": True, "samples": int(samples.size)}, to_pcm16(self.resampler(samples))
         if op == "end":
             tail = self.resampler(np.zeros(0, np.float32), final=True) if self.resampler else np.zeros(0)
@@ -94,6 +107,9 @@ class Worker:
 
 
 def serve(stdin: IO[bytes], stdout: IO[bytes]) -> None:
+    import mlx.core as mx  # noqa: PLC0415
+
+    mx.set_cache_limit(CACHE_LIMIT)
     worker = Worker()
     while True:
         try:

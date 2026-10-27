@@ -4,16 +4,17 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gbx-codecs"
-version = "0.1.0"
-description = "Audio codecs for speech models served by gbx-lm, run as a companion process on Apple silicon"
+version = "0.1.1"
+description = "Audio codecs for speech models served by gbx-lm, run as a companion process on Apple silicon and NVIDIA GPUs"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "licenses/*"]
 requires-python = ">=3.10"
 authors = [{ name = "GreenBitAI" }]
-dependencies = ["mlx>=0.29", "numpy>=1.24", "miniaudio>=1.59"]
+dependencies = ["mlx>=0.29", "numpy>=1.24"]
 classifiers = [
     "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
 ]
@@ -25,6 +26,7 @@ Homepage = "https://github.com/GreenBitAI/gbx-codecs"
 gbx-codecs = "gbx_codecs.__main__:main"
 
 [project.optional-dependencies]
+formats = ["miniaudio>=1.59"]
 test = ["pytest"]
 
 [tool.hatch.build.targets.wheel]

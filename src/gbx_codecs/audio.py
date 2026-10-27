@@ -3,15 +3,30 @@
 from __future__ import annotations
 
 import math
+import wave
 from pathlib import Path
 
 import numpy as np
 
 
 def read_audio(path: str | Path, sample_rate: int) -> np.ndarray:
-    """Mono float32 samples of an audio file (wav, flac, mp3, ...) at ``sample_rate``."""
-    import miniaudio
+    """Mono float32 samples of an audio file at ``sample_rate``.
 
+    WAV (8/16/24/32-bit PCM) is read with the standard library; anything else
+    (flac, mp3, float WAV) needs ``miniaudio`` -- ``pip install gbx-codecs[formats]``
+    -- which has no wheel for Linux on ARM and builds from source there.
+    """
+    try:
+        return _read_wav(path, sample_rate)
+    except (wave.Error, EOFError, ValueError):
+        pass
+    try:
+        import miniaudio
+    except ImportError as e:
+        raise ValueError(
+            f"{path}: only PCM WAV can be read without miniaudio; "
+            "convert it to WAV, or `pip install gbx-codecs[formats]`"
+        ) from e
     decoded = miniaudio.decode_file(
         str(path),
         output_format=miniaudio.SampleFormat.FLOAT32,
@@ -19,6 +34,26 @@ def read_audio(path: str | Path, sample_rate: int) -> np.ndarray:
         sample_rate=sample_rate,
     )
     return np.frombuffer(decoded.samples, dtype=np.float32).copy()
+
+
+def _read_wav(path: str | Path, sample_rate: int) -> np.ndarray:
+    with wave.open(str(path), "rb") as w:
+        width, channels, rate = w.getsampwidth(), w.getnchannels(), w.getframerate()
+        raw = w.readframes(w.getnframes())
+    if width == 1:
+        x = (np.frombuffer(raw, np.uint8).astype(np.float32) - 128.0) / 128.0
+    elif width == 2:
+        x = np.frombuffer(raw, "<i2").astype(np.float32) / 32768.0
+    elif width == 3:
+        b = np.frombuffer(raw, np.uint8).reshape(-1, 3).astype(np.int32)
+        v = b[:, 0] | (b[:, 1] << 8) | (b[:, 2] << 16)
+        x = (np.where(v >= 1 << 23, v - (1 << 24), v)).astype(np.float32) / float(1 << 23)
+    elif width == 4:
+        x = np.frombuffer(raw, "<i4").astype(np.float32) / float(1 << 31)
+    else:
+        raise ValueError(f"{path}: {width}-byte WAV samples")
+    x = x.reshape(-1, channels).mean(axis=1) if channels > 1 else x
+    return Resampler(rate, sample_rate)(x, final=True)
 
 
 def to_pcm16(samples: np.ndarray) -> bytes:

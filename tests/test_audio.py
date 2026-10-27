@@ -36,3 +36,21 @@ def test_same_rate_is_untouched():
 def test_pcm16_clips_and_is_little_endian():
     raw = to_pcm16(np.array([0.0, 1.5, -1.5, 0.5], np.float32))
     assert np.frombuffer(raw, "<i2").tolist() == [0, 32767, -32767, 16383]
+
+
+def test_wav_is_read_without_miniaudio(tmp_path):
+    import wave
+
+    from gbx_codecs.audio import read_audio
+
+    x = tone(24000)
+    for width, scale, dtype in ((2, 32767, "<i2"), (4, 2**31 - 1, "<i4")):
+        path = tmp_path / f"t{width}.wav"
+        with wave.open(str(path), "wb") as w:
+            w.setnchannels(2)
+            w.setsampwidth(width)
+            w.setframerate(24000)
+            w.writeframes(np.repeat((x * scale).astype(dtype), 2).tobytes())
+        y = read_audio(path, 44100)
+        assert abs(len(y) - 44100) <= 1
+        assert abs(np.abs(y[2000:-2000]).max() - 0.5) < 0.01

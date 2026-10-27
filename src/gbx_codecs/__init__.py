@@ -5,4 +5,4 @@ codes, in a process of its own (``python -m gbx_codecs serve``) so the server
 needs none of its dependencies.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
